@@ -1,0 +1,177 @@
+{% block title %}{% endblock %}
+{% block head %}
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>PicShare - Login</title>
+{% endblock %}
+{% block content %}
+
+
+	<form method="POST" action="/login">
+
+		<div class="login">
+
+			<div class='login-form'>
+
+				<div class="login-header">
+					<h2>Login</h2>
+					<p>PicShare created by <a href='https://arpanneupane.com'>Arpan Neupane</a></p>
+				</div>
+
+				<div class='message-flash'>
+					{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+						{% for category, message in messages %}
+							<div class="alert alert-{{ category }}">
+							{{ message }}
+							</div>
+						{% endfor %}
+					{% endif %}
+					{% endwith %}
+				</div>
+
+	
+				<div class='input'>
+					{{form.hidden_tag()}}
+					{{form.username}}
+					{{form.password}}
+					<div class='submit'>{{form.submit}}</div>
+				</div>
+				<div class='small-text'>
+					<p>By signing up, you agree to our Terms, Data Policy and Cookies Policy.</p>
+				</div>
+	
+	
+			</div>
+
+
+
+			<div class='dont-have-account'>
+				<div class='login-link'>
+					<p>Don't have an account?</p>
+					<a href='/sign-up'>Sign Up</a>
+				</div>
+			</div>
+
+		</div>
+		
+		
+
+	</form> 
+
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+		* {
+			margin: 0;
+			font-family: 'Roboto', sans-serif;
+		}
+
+		.message-flash {
+			color: white;
+			background-color: #0088ff;
+			width: 230px;
+			border-radius: 3px;
+			text-align: center;
+			margin-bottom: 10px;
+		}
+
+		.login {
+			display: flex;
+			justify-content: center;
+			flex-direction: column;
+			align-items: center;
+			margin-top: 100px;
+		}
+
+		.login-form {
+			border-radius: 10px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid lightgray;
+			width: 325px;
+			height: 325px;
+		}
+
+
+		.login-header {
+			padding-bottom: 20px;
+			text-align: center;
+		}
+
+
+		.login-header > p {
+			font-size: small;
+			margin-top: 5px;
+		}
+
+		.login-header > p > a {
+			text-decoration: none;
+			color: #0088ff;
+		}
+		
+		.input {
+			display: flex;
+			flex-direction: column;
+			margin-left: 6%;
+			margin-right: 6%;
+
+		}
+
+		.input > input{
+			margin-bottom: 10px;
+			height: 35px;
+			width: 230px;
+			border: 1px solid lightgray;
+			border-radius: 3px;
+			padding-left: 10px;
+		}
+
+		.submit > input{
+			height: 30px;
+			width: 230px;
+			cursor: pointer;
+			background-color: #0088ff;
+			border: none;
+			color: white;
+			border-radius: 3px;
+			margin-bottom: 10px;
+		}
+
+		.small-text {
+			margin-top: 10px;
+			font-size: 11px;
+			text-align: center;
+			margin-left: 20px;
+			margin-right: 20px;
+		}
+
+		.dont-have-account {
+			margin-top: 15px;
+			border: 1px solid lightgray;
+			width: 325px;
+			border-radius: 10px;
+			height: 70px;
+		}
+
+
+		.login-link {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-top: 30px;
+			font-size: 13px;
+		}
+
+		.login-link > a {
+			text-decoration: none;
+			color: #0088ff;
+			margin-left: 5px;
+		}
+
+	</style>
+
+
+{% endblock %}
