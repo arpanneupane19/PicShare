@@ -1,0 +1,19 @@
+App:
+	NavBar
+	Login
+	Signup
+
+NavBar:
+	Feed
+	Make Post
+	Account/Profile
+	Logout
+
+Feed:
+	Post
+	Delete
+	Edit
+	Like
+	Comment
+	
+		

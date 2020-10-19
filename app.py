@@ -40,68 +40,91 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(40), unique=True)
     password = db.Column(db.String(80))
+    posts = db.relationship('Post', backref='owner', lazy=True)
     bio_content = db.Column(db.String(1000))
 
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    caption = db.Column(db.String(100), nullable=False)
+    picture = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
 # Forms
 class SignupForm(FlaskForm):
-	username = StringField(validators=[InputRequired(), Length(min=4, max=15)], render_kw={"placeholder": "Username"})
-	email = StringField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Email"})
-	password = PasswordField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Password"})
-	submit = SubmitField('Sign up')
+    username = StringField(validators=[InputRequired(), Length(min=4, max=15)], render_kw={"placeholder": "Username"})
+    email = StringField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Email"})
+    password = PasswordField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Password"})
+    submit = SubmitField('Sign up')
+
+    def validate_username(self, username):
+        existing_user_username = User.query.filter_by(username=username.data).first()
+        if existing_user_username:
+            raise ValidationError("That username already exists. Please choose a different one.")
+
+    def validate_email(self, email):
+        existing_user_email = User.query.filter_by(email=email.data).first()
+        if existing_user_email:
+            raise ValidationError("That email address belongs to different user. Please choose a different one.")
 
 
 class LoginForm(FlaskForm):
-	username = StringField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Username"})
-	password = PasswordField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Password"})
-	submit = SubmitField('Log In')
+    username = StringField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Username"})
+    password = PasswordField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Password"})
+    submit = SubmitField('Log In')
 
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-	return render_template('dashboard.html')
+    posts = Post.query.all()
+    return render_template('dashboard.html', posts=posts)
 
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def home():
-	form = LoginForm()
-
-	if form.validate_on_submit():
-		user = User.query.filter_by(username=form.username.data).first()
-		if user:
-			if bcrypt.check_password_hash(user.password, form.password.data):
-				login_user(user)
-				return redirect(url_for('dashboard'))
-	return render_template('home.html', form=form)
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user:
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                login_user(user)
+                return redirect(url_for("dashboard"))
+        flash('User does not exist or invalid password.')
+    return render_template('home.html', form=form)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-	logout_user()
-	flash('You have been logged out.')
-	return redirect(url_for('home'))
+    logout_user()
+    flash('You have been logged out.')
+    return redirect(url_for('home'))
 
 
 @app.route('/sign-up', methods=['GET', 'POST'])
 def signup():
-	form = SignupForm()
+    form = SignupForm()
 
-	if current_user.is_authenticated:
-		return redirect(url_for('dashboard'))
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
 
-	if form.validate_on_submit():
-		hashed_password = bcrypt.generate_password_hash(form.password.data)
-		new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
-		db.session.add(new_user)
-		db.session.commit()
-		flash(f'Account has been created for {form.username.data}.')
-		return redirect(url_for('home'))
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash(f'Account has been created for {form.username.data}.')
+        return redirect(url_for('home'))
 
-	return render_template('signup.html', form=form)
+    return render_template('signup.html', form=form)
+
+
+@app.route('/post', methods=['GET', 'POST'])
+def create_post():
+    return 'This is the page to create posts'
 
 
 if __name__ == '__main__':
-	app.run(debug=True)
+    app.run(debug=True)
