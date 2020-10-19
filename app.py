@@ -47,7 +47,7 @@ class User(db.Model, UserMixin):
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     caption = db.Column(db.String(100), nullable=False)
-    picture = db.Column(db.String(20), nullable=False)
+    picture = db.Column(db.String(30), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
@@ -75,14 +75,20 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Log In')
 
 
+class PostForm(FlaskForm):
+    caption = TextAreaField(validators=[InputRequired(), Length(min=0, max=1000)], render_kw={"placeholder": "Caption"})
+    picture = FileField("Picture", validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    submit = SubmitField("Upload Post")
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
     posts = Post.query.all()
-    return render_template('dashboard.html', posts=posts)
+    return render_template('dashboard.html', posts=posts, title='Dashboard')
 
 
 @app.route('/', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def home():
     form = LoginForm()
@@ -97,6 +103,7 @@ def home():
 
 
 @app.route('/logout', methods=['GET', 'POST'])
+@login_required
 def logout():
     logout_user()
     flash('You have been logged out.')
@@ -120,10 +127,21 @@ def signup():
 
     return render_template('signup.html', form=form)
 
+def save_picture(form_profile_pic):
+    rand_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_profile_pic.filename)
+    picture_name = rand_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/pictures', picture_name)
+    form_profile_pic.save(picture_path)
+
+    return picture_name
+
 
 @app.route('/post', methods=['GET', 'POST'])
+@login_required
 def create_post():
-    return 'This is the page to create posts'
+    form = PostForm()
+    return render_template('create_post.html', form=form)
 
 
 if __name__ == '__main__':

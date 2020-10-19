@@ -2,43 +2,34 @@
 {% block head %}
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>PicShare - Sign Up</title>
 {% endblock %}
 {% block content %}
 
-	<form method="POST" action="/sign-up">
+	<form method="POST" action="/post">
 
-		<div class="signup">
+		<div class="post">
 
-			<div class='signup-form'>
+			<div class='post-form'>
 
-				<div class="signup-header">
-					<h2>Sign up</h2>
-					<p>Share your world.</p>
+				<div class="post-header">
+					<h2>New Post</h2>
 				</div>
 	
 				<div class='input'>
 					{{form.hidden_tag()}}
-					{{form.username}}
-					{{form.email}}
-					{{form.password}}
+					{{form.caption}}
+					<div class='picture'>
+						{{form.picture}}
+					</div>
 					<div class='submit'>{{form.submit}}</div>
 				</div>
+
 				<div class='small-text'>
-					<p>By signing up, you agree to our Terms, Data Policy and Cookies Policy.</p>
-				</div>
-	
-	
-			</div>
-
-
-
-			<div class='have-an-account'>
-				<div class='login-link'>
-					<p>Have an account?</p>
-					<a href='/login'>Log in</a>
+					<p>This post will be visible to everyone using this app.</p>
 				</div>
 			</div>
+
+
 
 		</div>
 		
@@ -55,15 +46,15 @@
 		}
 
 
-		.signup {
+		.post {
 			display: flex;
 			justify-content: center;
 			flex-direction: column;
 			align-items: center;
-			margin-top: 100px;
+			margin-top: 150px;
 		}
 
-		.signup-form {
+		.post-form {
 			border-radius: 10px;
 			display: flex;
 			flex-direction: column;
@@ -74,33 +65,39 @@
 		}
 
 
-		.signup-header {
-			margin-top: 40px;
+		.post-header {
+			margin-top: 50px;
 			margin-bottom: 20px;
 			text-align: center;
 		}
 
-		.signup-header > p {
-			font-size: small;
-			margin-top: 5px;
-
-		}
 		
 		.input {
 			display: flex;
 			flex-direction: column;
+			justify-content: center;
+			align-items: center;
 			margin-left: 6%;
 			margin-right: 6%;
-
+			margin-bottom: 10px;
 		}
 
-		.input > input{
+		.input > textarea{
+			display: flex;
 			margin-bottom: 10px;
-			height: 35px;
-			width: 230px;
+			max-width: 270px;
+			min-width: 270px;
+			min-height: 35px;
 			border: 1px solid lightgray;
 			border-radius: 3px;
 			padding-left: 10px;
+		}
+
+		.picture {	
+			padding: 5px;
+			border: 1px solid lightgray;
+			border-radius: 3px;
+			margin-bottom: 10px;
 		}
 
 		.submit > input{
@@ -111,39 +108,14 @@
 			border: none;
 			color: white;
 			border-radius: 3px;
-			margin-bottom: 10px;
 		}
 
 		.small-text {
-			margin-top: 10px;
-			font-size: 11px;
+			font-size: small;
 			text-align: center;
 			margin-left: 20px;
 			margin-right: 20px;
-			margin-bottom: 40px;
-		}
-
-		.have-an-account {
-			margin-top: 15px;
-			border: 1px solid lightgray;
-			width: 325px;
-			border-radius: 10px;
-		}
-
-
-		.login-link {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			margin-top: 20px;
-			margin-bottom: 20px;
-			font-size: 13px;
-		}
-
-		.login-link > a {
-			text-decoration: none;
-			color: #0088ff;
-			margin-left: 5px;
+			margin-bottom: 50px;
 		}
 
 	</style>
