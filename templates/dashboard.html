@@ -13,6 +13,9 @@
 			<h3>PicShare</h3>
 		</div>
 
+		<div class='header-middle'>
+			<input type='text' placeholder='Search...'>
+		</div>
 
 		<div class='header-right'>
 			<a href='#'>Feed</i></a>
@@ -24,6 +27,12 @@
 	</div>
 	<hr>
 
+
+	{% for post in posts %}
+		<p>{{ post.caption }}</p>
+		<p>{{ post.picture }}</p>
+		<p>{{ post.owner }}</p>
+	{% endfor %}
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
 
@@ -41,6 +50,7 @@
 		hr {
 			height: .1px;
 			background-color: lightgray;
+			width: 100%;
 
 		}
 		.nav-bar {
@@ -60,7 +70,19 @@
 
 		.header-right {
 			padding-right: 60px;
+			display: flex;
+		}
 
+		.header-middle {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.header-middle > input {
+			padding-left: 10px;
+			height: 25px;
+			width: 180px;
 		}
 
 

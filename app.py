@@ -5,6 +5,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import InputRequired, Email, Length, ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_mail import Mail, Message
 import os
@@ -12,9 +13,10 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from datetime import datetime
 from flask_bcrypt import Bcrypt
 import secrets
+import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'jfale!@#gys^&*(@jafd00193n'
+app.config['SECRET_KEY'] = '4u9ajdslkf02kaldsjfj0'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 app.config['MAIL_SERVER']='smtp.gmail.com'
@@ -34,6 +36,12 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+
+
 # Database Tables
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,7 +55,7 @@ class User(db.Model, UserMixin):
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     caption = db.Column(db.String(100), nullable=False)
-    picture = db.Column(db.String(30), nullable=False)
+    picture = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
@@ -127,20 +135,28 @@ def signup():
 
     return render_template('signup.html', form=form)
 
-def save_picture(form_profile_pic):
+
+def save_picture(form_picture):
     rand_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_profile_pic.filename)
+    _, f_ext = os.path.splitext(form_picture.filename)
     picture_name = rand_hex + f_ext
     picture_path = os.path.join(app.root_path, 'static/pictures', picture_name)
-    form_profile_pic.save(picture_path)
-
-    return picture_name
+    form_picture.save(picture_path)
 
 
 @app.route('/post', methods=['GET', 'POST'])
 @login_required
 def create_post():
     form = PostForm()
+
+    if form.validate_on_submit():
+        if form.picture.data:
+            new_picture = save_picture(form.picture.data)
+            form.picture.data = new_picture
+        new_post = Post(caption=form.caption.data, picture=form.picture.data, owner=current_user)
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for('dashboard'))
     return render_template('create_post.html', form=form)
 
 
