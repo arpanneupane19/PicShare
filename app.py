@@ -234,14 +234,14 @@ def reset_password(token):
         return redirect(url_for('forgot-password'))
 
 
+def convertToBinaryData(filename):
+    #Convert digital data to binary format
+    with open(filename, 'rb') as file:
+        blobData = file.read()
+    return blobData
 
-def save_picture(form_picture):
-    rand_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_name = rand_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/pictures', picture_name)
-    form_picture.save(picture_path)
-
+def insertBlob(picture):
+    post_picture = convertToBinaryData(picture)
 
 @app.route('/post', methods=['GET', 'POST'])
 @login_required
@@ -250,11 +250,9 @@ def create_post():
 
     if form.validate_on_submit():
         if form.picture.data:
-            new_picture = save_picture(form.picture.data)
-            form.picture.data = new_picture
-        new_post = Post(caption=form.caption.data, picture=form.picture.data, owner=current_user)
-        db.session.add(new_post)
-        db.session.commit()
+            picture = insertBlob(form.picture.data)
+        
+
         return redirect(url_for('dashboard'))
     return render_template('create_post.html', form=form)
 
