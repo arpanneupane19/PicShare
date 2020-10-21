@@ -6,6 +6,8 @@
 {% endblock %}
 {% block content %}
 
+
+
 	<form method="POST" action="/sign-up">
 
 		<div class="signup">
@@ -21,7 +23,22 @@
 					{{form.hidden_tag()}}
 					{{form.username}}
 					{{form.email}}
-					{{form.password}}
+					<div class='password'>
+						<input type='password' placeholder="Password" name='password' id='password-input'>
+						<div class='checkbox'>
+							<input type='checkbox' onclick='toggle()'>
+						</div>
+					</div>
+					<script>
+						function toggle() {
+							var x = document.getElementById("password-input");
+							if (x.type === "password") {
+							x.type = "text";
+							} else {
+							x.type = "password";
+							}
+  						}				
+					</script>
 					<div class='submit'>{{form.submit}}</div>
 				</div>
 				<div class='small-text'>
@@ -45,6 +62,7 @@
 		
 
 	</form> 
+
 
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
@@ -97,7 +115,7 @@
 		.input > input{
 			margin-bottom: 10px;
 			height: 35px;
-			width: 230px;
+			width: 270px;
 			border: 1px solid lightgray;
 			border-radius: 3px;
 			padding-left: 10px;
@@ -105,7 +123,7 @@
 
 		.submit > input{
 			height: 30px;
-			width: 230px;
+			width: 270px;
 			cursor: pointer;
 			background-color: #0088ff;
 			border: none;
@@ -113,6 +131,34 @@
 			border-radius: 3px;
 			margin-bottom: 10px;
 		}
+
+		.password {
+			display: flex;
+			border: 1px solid lightgray;
+			margin-bottom: 10px;
+			border-radius: 3px;
+			height: 35px;
+		}
+
+
+		.checkbox {
+			display: flex;
+			align-items: center;
+			margin-right: 10px;
+			margin-left: 10px;
+			font-size: small;
+
+		}
+		
+
+
+		.password > input {
+			width: 230px;
+			border: none;
+			border-radius: 3px;
+			padding-left: 10px;
+		}
+
 
 		.small-text {
 			margin-top: 10px;

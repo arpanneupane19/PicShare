@@ -21,8 +21,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = os.environ.get("EMAIL_BLOGGY")
-app.config['MAIL_PASSWORD'] = os.environ.get("PASSWORD_BLOGGY")
+app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_PICSHARE')
+app.config['MAIL_PASSWORD'] = os.environ.get('PASSWORD_PICSHARE')
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
@@ -48,9 +48,22 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(40), unique=True)
     password = db.Column(db.String(80))
-    posts = db.relationship('Post', backref='owner', lazy=True)
+    posts = db.relationship('Post', backref='owner', lazy='dynamic')
     bio_content = db.Column(db.String(1000))
 
+
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +76,6 @@ class Post(db.Model):
 class SignupForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=15)], render_kw={"placeholder": "Username"})
     email = StringField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Email"})
-    password = PasswordField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Password"})
     submit = SubmitField('Sign up')
 
     def validate_username(self, username):
@@ -87,6 +99,12 @@ class PostForm(FlaskForm):
     caption = TextAreaField(validators=[InputRequired(), Length(min=0, max=1000)], render_kw={"placeholder": "Caption"})
     picture = FileField("Picture", validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
     submit = SubmitField("Upload Post")
+
+
+class ForgotPassword(FlaskForm):
+    email = StringField(validators=[InputRequired(), Email(message="Invalid Email"), Length(max=50)], render_kw={"placeholder": "Enter your email"})
+    submit = SubmitField('Submit')
+
 
 @app.route('/dashboard')
 @login_required
@@ -126,7 +144,8 @@ def signup():
         return redirect(url_for('dashboard'))
 
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        password = request.form.get('password')
+        hashed_password = bcrypt.generate_password_hash(password)
         new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
@@ -134,6 +153,41 @@ def signup():
         return redirect(url_for('home'))
 
     return render_template('signup.html', form=form)
+
+# Reset email
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message('Forgot your password?',
+                  sender='noreply@demo.com',
+                  recipients=[user.email])
+    msg.body = f'''To reset your password, visit the following link:
+    {url_for('reset_password', token=token, _external=True)}
+If you did not make this request then simply ignore this email.
+'''
+    mail.send(msg)
+
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    form = ForgotPassword()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_reset_email(user)
+            flash('An email has been sent to the email address you entered.')
+        if not user:
+            flash('There is no account with that email address.')
+
+    return render_template('forgot_password.html', form=form)
+
+
+@app.route('/reset-password/<token>')
+def reset_password(token):
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect(url_for('forgot-password'))
+
 
 
 def save_picture(form_picture):
