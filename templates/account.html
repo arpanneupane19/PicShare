@@ -36,11 +36,35 @@
 		<div class='account-box-top'>
 			<div class='username-photo'>
 				<img src='../static/profile_pics/me.jpg' width="50" height="50">
-				<h4>{{ current_user.username }}</h4>
-
+				<div class='post-total-username'>
+					<h4>{{ current_user.username }}</h4>
+					<p>Number of posts: {{ posts_num }}</p>
+				</div>
 			</div>
-			<a href='#'>Change Profile Photo</a>
 		</div>
+
+		<div class='message-flash'>
+			{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				{% for category, message in messages %}
+					<div class="alert alert-{{ category }}">
+					{{ message }}
+					</div>
+				{% endfor %}
+			{% endif %}
+			{% endwith %}
+		</div>
+
+		<form method='POST' action='/account'>
+		<div class='edit-account'>
+				{{form.hidden_tag()}}
+				{{form.email(value=email, placeholder='Email')}}
+				{{form.username(value=username, placeholder='Username')}}
+				<div class='bio'>{{form.bio(value=bio, placeholder='Bio')}}</div>
+				<div class='submit'>{{form.submit}}</div>
+		</div>
+	</form>
+
 		
 	</div>
 
@@ -110,9 +134,10 @@
 			border: 1px solid lightgray;
 			border-radius: 3px;
 			display: flex;
-			width: 600px;
+			flex-direction: column;
 			margin-top: 50px;
-			margin-left: 400px;
+			margin-left: 30%;
+			margin-right: 30%;
 		}
 
 		.account-box-top {
@@ -120,29 +145,76 @@
 			flex-direction: column;
 			padding-left: 150px;
 			margin-top: 25px;
+			margin-bottom: 30px;
 
 		}
 
-		.account-box-top > a {
-			color:  #0088ff;
-			font-weight: bold;
-			font-size: smaller;
-			margin-left: 55px;
-			margin-bottom: 30px;
+		.message-flash {
+			color: white;
+			background-color: #0088ff;
+
+			border-radius: 3px;
+			text-align: center;
+			margin-bottom: 10px;
+			margin-left: 30%;
+			margin-right: 30%;
 		}
 
 		.username-photo {
 			display: flex;
 		}
 
-		.username-photo > h4 {
+		.post-total-username {
 			margin-top: 15px;
 			margin-left: 10px;
 			padding: 0;
 		}
 
+		.post-total-username > p{
+			font-size: 13px;
+		}
+
 		.username-photo > img {
 			border-radius: 50px;
+		}
+
+		.edit-account {
+			display: flex;
+			border-radius: 3px;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.edit-account > input{
+			margin-bottom: 10px;
+			height: 35px;
+			width: 270px;
+			border: 1px solid lightgray;
+			border-radius: 3px;
+			padding-left: 10px;
+		}
+
+		.bio > textarea {
+			max-width: 270px;
+			min-width: 270px;
+			border: 1px solid lightgray;
+			padding: 10px;
+			margin-bottom: 10px;
+			min-height: 35px;
+			height: 35px;
+			border-radius: 3px;
+		}
+
+		.submit > input{
+			height: 30px;
+			width: 270px;
+			cursor: pointer;
+			background-color: #0088ff;
+			border: none;
+			color: white;
+			border-radius: 3px;
+			margin-bottom: 10px;
 		}
 
 	</style>

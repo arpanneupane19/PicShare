@@ -48,7 +48,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(40), unique=True)
     password = db.Column(db.String(80))
-    posts = db.relationship('Post', backref='owner', lazy='dynamic')
+    posts = db.relationship('Post', backref='owner', lazy=True)
     bio_content = db.Column(db.String(1000))
 
 
@@ -106,6 +106,26 @@ class ForgotPassword(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class UpdateAccount(FlaskForm):
+    email = StringField("Email", validators=[InputRequired(), Email(message="Invalid Email"), Length(max=50)], render_kw={"placeholder": "example@gmail.com"})
+    username = StringField("Username", validators=[InputRequired(), Length(min=4, max=15)])
+    bio = TextAreaField('Bio', [Length(min=0, max=1000)])
+    submit = SubmitField('Update Account')
+
+
+    def validate_username(self, username):
+        if current_user.username != username.data:
+            user = User.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError("That username already exists. Please choose a different one.")
+
+    def validate_email(self, email):
+        if current_user.email != email.data:
+            email = User.query.filter_by(email=email.data).first()
+            if email:
+                raise ValidationError("That email address belongs to different user. Please choose a different one.")
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -157,7 +177,27 @@ def signup():
 
 @app.route('/account', methods=['GET', 'POST'])
 def account():
-    return render_template('account.html')
+    form = UpdateAccount()
+    posts = Post.query.filter_by(owner=current_user).all()
+    post_total = 0
+    for post in posts:
+        post_total += 1
+
+    if form.validate_on_submit():
+        current_user.email = form.email.data
+        current_user.username = form.username.data
+        current_user.bio_content = form.bio.data
+        db.session.commit()
+        flash('Your account has been updated!')
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.email.data = current_user.email
+        form.username.data = current_user.username
+        form.bio.data = current_user.bio_content
+    
+
+
+    return render_template('account.html', form=form, email=current_user.email, username=current_user.username, posts_num=post_total)
 
 # Reset email
 def send_reset_email(user):
