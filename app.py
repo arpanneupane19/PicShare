@@ -154,6 +154,11 @@ def signup():
 
     return render_template('signup.html', form=form)
 
+
+@app.route('/account', methods=['GET', 'POST'])
+def account():
+    return render_template('account.html')
+
 # Reset email
 def send_reset_email(user):
     token = user.get_reset_token()
