@@ -20,7 +20,7 @@
 		</div>
 
 		<div class='header-right'>
-			<a href='#'><i class="fas fa-home"></i></a>
+			<a href='/dashboard'><i class="fas fa-home"></i></a>
 			<a href='/post'><i class="fas fa-plus-square"></i></a>
 			<a href='/account'><i class="fas fa-user-circle"></i></a>
 			<a href='/logout'><i class="fas fa-sign-out-alt"></i></a>
@@ -30,32 +30,29 @@
 	<hr>
 
 
-	{% for post in posts %}
+
 	<div class='post'>
 		<div class='post-content'>
 
 			<div class='profile-pic-username'>
 				<img src="../static/profile_pics/{{ post.owner.profile_pic }}" width="50" height="50">
-
 				<p>{{ post.owner.username }}</p>
-				<!-- <div class='w3-dropdown-hover'>
+				<div class='w3-dropdown-hover'>
 					<button class="w3-button w3-white"><i class="fas fa-ellipsis-h"></i></button>
-					<div class="w3-dropdown-content w3-bar-block w3-border">
-						<a href="#" class="w3-bar-item w3-button">Update Post</a>
-						<a href="#" class="w3-bar-item w3-button">Delete Post</a>
+					<div class="w3-dropdown-content w3-bar-block w3-border w3-animate-zoom">
+						<a href="#" class="w3-bar-item w3-button update">Update Post</a>
+						<a href="#" class="w3-bar-item w3-button delete">Delete Post</a>
 					</div>
-				</div> -->
+				</div>
 			</div>
 
 			<div class="post-image">
 				<img src='../static/pictures/{{ post.picture }}'>
 			</div>
-
 		
 			<div class='post-info'>
-				<p>{{ total }}</p>
 				<div class='icons'>
-					<a href="{{ url_for('like_post', post_id=post.id) }}"><i class="fas fa-heart"></i></a>
+					<a href='#'><i class="fas fa-heart"></i></a>
 					<a href='#'><i class="fas fa-comment"></i></a>
 				</div>
 	
@@ -67,7 +64,7 @@
 		</div>
 	
 	</div>
-	{% endfor %}
+
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
 

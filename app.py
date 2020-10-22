@@ -52,6 +52,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80))
     profile_pic = db.Column(db.String(20), nullable=False, default='default.jpg')
     posts = db.relationship('Post', backref='owner', lazy=True)
+    liked_post = db.relationship('LikePost', backref='liker', lazy=True)
     bio_content = db.Column(db.String(1000))
 
 
@@ -72,7 +73,15 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     caption = db.Column(db.String(100), nullable=False)
     picture = db.Column(db.String(20), nullable=False)
+    likes = db.relationship('LikePost', backref='liked', lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+
+
+class LikePost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
 
 
 # Forms
@@ -134,7 +143,9 @@ class UpdateAccount(FlaskForm):
 @login_required
 def dashboard():
     posts = Post.query.all()
-    return render_template('dashboard.html', posts=posts, title='Dashboard')
+
+
+    return render_template('dashboard.html', posts=posts, title='Dashboard', total=total)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -277,6 +288,32 @@ def create_post():
 
 
     return render_template('create_post.html', form=form)
+
+
+@app.route('/post/<int:post_id>')
+@login_required
+def specific_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('specific_post.html')
+
+
+@app.route('/post/like/<int:post_id>')
+@login_required
+def like_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    post_like = LikePost(liker=current_user, liked=post)
+    likes = LikePost.query.filter_by(liked=post).all()
+    db.session.add(post_like)
+    db.session.commit()
+
+    global total
+    total = 0
+    for i in likes:
+        total += 1
+    return redirect(url_for('dashboard'))
+
+
+
 
 
 if __name__ == '__main__':
