@@ -269,6 +269,9 @@ def create_post():
             flash('No file part')
             return redirect(request.url)
         file = request.files['file']
+        rand_hex = secrets.token_hex(8)
+        _, f_ext = os.path.splitext(file.filename)
+        file.filename = rand_hex + f_ext
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
