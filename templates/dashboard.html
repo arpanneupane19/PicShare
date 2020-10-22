@@ -4,6 +4,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>PicShare - Home</title>
 	<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 {% endblock %}
 {% block content %}
 
@@ -36,8 +37,12 @@
 			<div class='profile-pic-username'>
 				<img src="../static/profile_pics/{{ post.owner.profile_pic }}" width="50" height="50">
 				<p>{{ post.owner.username }}</p>
-				<div class='ellipsis'>
-					<a href='#'><p><i class="fas fa-ellipsis-h"></i></p></a>
+				<div class='w3-dropdown-hover'>
+					<button class="w3-button w3-white"><i class="fas fa-ellipsis-h"></i></button>
+					<div class="w3-dropdown-content w3-bar-block w3-border w3-animate-zoom">
+						<a href="#" class="w3-bar-item w3-button update">Update Post</a>
+						<a href="#" class="w3-bar-item w3-button delete">Delete Post</a>
+					</div>
 				</div>
 			</div>
 
@@ -135,10 +140,12 @@
 			margin-left: 10px;
 		}
 
-		.ellipsis {
+		.w3-dropdown-hover {
 			margin-top: 15px;
-			margin-left: 400px;
+			margin-left: 380px;
+			background-color: white;
 		}
+
 
 		.caption {
 			margin-top: 20px;
