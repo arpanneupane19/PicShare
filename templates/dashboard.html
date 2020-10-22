@@ -31,8 +31,8 @@
 
 	{% for post in posts %}
 		<p>{{ post.caption }}</p>
-		<p>{{ post.picture }}</p>
-		<p>{{ post.owner }}</p>
+		<img src='../static/pictures/{{ post.picture }}' width="300" height="700">
+		<p>{{ post.owner.username }}</p>
 	{% endfor %}
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');

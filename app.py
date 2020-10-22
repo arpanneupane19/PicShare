@@ -14,9 +14,13 @@ from datetime import datetime
 from flask_bcrypt import Bcrypt
 from PIL import Image
 import secrets
+import time
 import datetime
 
+UPLOAD_FOLDER = './static/pictures'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = '4u9ajdslkf02kaldsjfj0'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
@@ -99,8 +103,6 @@ class LoginForm(FlaskForm):
 
 class PostForm(FlaskForm):
     caption = TextAreaField(validators=[InputRequired(), Length(min=0, max=1000)], render_kw={"placeholder": "Caption"})
-    picture = FileField("Picture", validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
-    submit = SubmitField("Upload Post")
 
 
 class ForgotPassword(FlaskForm):
@@ -253,31 +255,32 @@ def reset_password(token):
 
 
 
-def save_picture(form_picture):
-    rand_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_name = rand_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/pictures', picture_name)
-    form_picture.save(picture_path)
-
-    return picture_name
-
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/post', methods=['GET', 'POST'])
 @login_required
 def create_post():
 
     form = PostForm()
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            new_post = Post(caption=form.caption.data, picture=file.filename, owner=current_user)
+            db.session.add(new_post)
+            db.session.commit()
+            return redirect(url_for('dashboard', filename=filename))
 
-    if form.validate_on_submit():
-        pic_file = save_picture(form.picture.data)
-        post_caption = form.caption.data
-        post_image = pic_file
-        owner = current_user
-        new_post = Post(caption=post_caption, picture=post_image, owner=owner)
-        db.session.add(new_post)
-        db.session.commit()
-        return redirect(url_for('dashboard'))
+
     return render_template('create_post.html', form=form)
 
 
