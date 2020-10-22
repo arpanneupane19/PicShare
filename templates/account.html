@@ -35,7 +35,7 @@
 
 		<div class='account-box-top'>
 			<div class='username-photo'>
-				<img src='../static/profile_pics/me.jpg' width="50" height="50">
+				<img src='{{ profile_pic }}' width="50" height="50">
 				<div class='post-total-username'>
 					<h4>{{ current_user.username }}</h4>
 					<p>Number of posts: {{ posts_num }}</p>
@@ -55,12 +55,15 @@
 			{% endwith %}
 		</div>
 
-		<form method='POST' action='/account'>
+		<form method='POST' action='' enctype="multipart/form-data">
 		<div class='edit-account'>
 				{{form.hidden_tag()}}
 				{{form.email(value=email, placeholder='Email')}}
 				{{form.username(value=username, placeholder='Username')}}
 				<div class='bio'>{{form.bio(value=bio, placeholder='Bio')}}</div>
+				<div class='profile-pic'>
+					{{form.profile_pic}}
+				</div>
 				<div class='submit'>{{form.submit}}</div>
 		</div>
 	</form>
@@ -143,7 +146,7 @@
 		.account-box-top {
 			display: flex;
 			flex-direction: column;
-			padding-left: 150px;
+			margin-left: 150px;
 			margin-top: 25px;
 			margin-bottom: 30px;
 
@@ -162,6 +165,13 @@
 
 		.username-photo {
 			display: flex;
+		}
+
+		.profile-pic {
+			padding: 5px;
+			border: 1px solid lightgray;
+			border-radius: 3px;
+			margin-bottom: 10px;
 		}
 
 		.post-total-username {

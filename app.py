@@ -12,6 +12,7 @@ import os
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from datetime import datetime
 from flask_bcrypt import Bcrypt
+from PIL import Image
 import secrets
 import datetime
 
@@ -48,6 +49,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(40), unique=True)
     password = db.Column(db.String(80))
+    profile_pic = db.Column(db.String(20), nullable=False, default='default.jpg')
     posts = db.relationship('Post', backref='owner', lazy=True)
     bio_content = db.Column(db.String(1000))
 
@@ -110,6 +112,7 @@ class UpdateAccount(FlaskForm):
     email = StringField("Email", validators=[InputRequired(), Email(message="Invalid Email"), Length(max=50)], render_kw={"placeholder": "example@gmail.com"})
     username = StringField("Username", validators=[InputRequired(), Length(min=4, max=15)])
     bio = TextAreaField('Bio', [Length(min=0, max=1000)])
+    profile_pic = FileField("Picture", validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
     submit = SubmitField('Update Account')
 
 
@@ -175,29 +178,44 @@ def signup():
     return render_template('signup.html', form=form)
 
 
+def save_profile_pic(form_profile_pic):
+    rand_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_profile_pic.filename)
+    picture_name = rand_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_name)
+    form_profile_pic.save(picture_path)
+
+    output_size = (125, 125)
+    i = Image.open(form_profile_pic)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+    return picture_name
+
+
 @app.route('/account', methods=['GET', 'POST'])
 def account():
-    form = UpdateAccount()
     posts = Post.query.filter_by(owner=current_user).all()
     post_total = 0
     for post in posts:
         post_total += 1
 
+    form = UpdateAccount()
     if form.validate_on_submit():
-        current_user.email = form.email.data
+        if form.profile_pic.data:
+            picture_file = save_profile_pic(form.profile_pic.data)
+            current_user.profile_pic = picture_file
         current_user.username = form.username.data
+        current_user.email = form.email.data
         current_user.bio_content = form.bio.data
         db.session.commit()
-        flash('Your account has been updated!')
+        flash('Your account has been updated!', 'success')
         return redirect(url_for('account'))
     elif request.method == 'GET':
-        form.email.data = current_user.email
         form.username.data = current_user.username
+        form.email.data = current_user.email
         form.bio.data = current_user.bio_content
-    
-
-
-    return render_template('account.html', form=form, email=current_user.email, username=current_user.username, posts_num=post_total)
+    profile_pic = url_for('static', filename='profile_pics/' + current_user.profile_pic)
+    return render_template('account.html', form=form, email=current_user.email, username=current_user.username, posts_num=post_total, profile_pic=profile_pic)
 
 # Reset email
 def send_reset_email(user):
@@ -234,25 +252,31 @@ def reset_password(token):
         return redirect(url_for('forgot-password'))
 
 
-def convertToBinaryData(filename):
-    #Convert digital data to binary format
-    with open(filename, 'rb') as file:
-        blobData = file.read()
-    return blobData
 
-def insertBlob(picture):
-    post_picture = convertToBinaryData(picture)
+def save_picture(form_picture):
+    rand_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_name = rand_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/pictures', picture_name)
+    form_picture.save(picture_path)
+
+    return picture_name
+
 
 @app.route('/post', methods=['GET', 'POST'])
 @login_required
 def create_post():
+
     form = PostForm()
 
     if form.validate_on_submit():
-        if form.picture.data:
-            picture = insertBlob(form.picture.data)
-        
-
+        pic_file = save_picture(form.picture.data)
+        post_caption = form.caption.data
+        post_image = pic_file
+        owner = current_user
+        new_post = Post(caption=post_caption, picture=post_image, owner=owner)
+        db.session.add(new_post)
+        db.session.commit()
         return redirect(url_for('dashboard'))
     return render_template('create_post.html', form=form)
 
