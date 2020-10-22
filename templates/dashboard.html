@@ -30,9 +30,9 @@
 
 
 	{% for post in posts %}
-		<p>{{ post.caption }}</p>
-		<img src='../static/pictures/{{ post.picture }}' width="300" height="700">
+		<img src='../static/pictures/{{ post.picture }}' class="post-image">
 		<p>{{ post.owner.username }}</p>
+		<p>{{ post.caption }}</p>
 	{% endfor %}
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
@@ -54,6 +54,13 @@
 			background-color: lightgray;
 
 		}
+
+		.post-image {
+			width: 500px;
+			height: 500px;
+			object-fit: contain;
+		}
+
 		.nav-bar {
 			display: flex;
 			justify-content: space-between;
