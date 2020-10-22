@@ -30,9 +30,35 @@
 
 
 	{% for post in posts %}
-		<img src='../static/pictures/{{ post.picture }}' class="post-image">
-		<p>{{ post.owner.username }}</p>
-		<p>{{ post.caption }}</p>
+	<div class='post'>
+		<div class='post-content'>
+
+			<div class='profile-pic-username'>
+				<img src="../static/profile_pics/{{ post.owner.profile_pic }}" width="50" height="50">
+				<p>{{ post.owner.username }}</p>
+				<div class='ellipsis'>
+					<a href='#'><p><i class="fas fa-ellipsis-h"></i></p></a>
+				</div>
+			</div>
+
+			<div class="post-image">
+				<img src='../static/pictures/{{ post.picture }}'>
+			</div>
+		
+			<div class='post-info'>
+				<div class='icons'>
+					<a href='#'><i class="fas fa-heart"></i></a>
+					<a href='#'><i class="fas fa-comment"></i></a>
+				</div>
+	
+				<div class='caption'>
+					<p>{{ post.caption }}</p>
+				</div>
+			</div>
+
+		</div>
+	
+	</div>
 	{% endfor %}
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
@@ -55,12 +81,68 @@
 
 		}
 
-		.post-image {
-			width: 500px;
-			height: 500px;
-			object-fit: contain;
+		.post {
+			display: flex;
+			flex-direction: column;
+			margin-top: 40px;
+			justify-content: center;
+			align-items: center;
+			margin-bottom: 40px;
+		}
+		
+
+		.post-info {
+			margin-left: 10px;
+			display: flex;
+			flex-direction: column;
 		}
 
+
+		.icons > a{
+			font-size: larger;
+			margin-right: 10px;
+		}
+
+		.post-content {
+			border: 1px solid lightgray;
+			padding-top: 10px;
+			padding-bottom: 10px;
+		}
+
+
+		.post-image > img{
+			width: 600px;
+			height: 400px;
+			object-fit: cover;
+
+			margin-bottom: 20px;
+		}
+
+		.profile-pic-username {
+			border-radius: 50%;
+			display: flex;
+			margin-bottom: 10px;
+		}
+
+		.profile-pic-username > p {
+			margin-top: 15px;
+			margin-left: 10px;
+		}
+
+		.profile-pic-username > img {
+			border-radius: 50%;
+			cursor: pointer;
+			margin-left: 10px;
+		}
+
+		.ellipsis {
+			margin-top: 15px;
+			margin-left: 400px;
+		}
+
+		.caption {
+			margin-top: 20px;
+		}
 		.nav-bar {
 			display: flex;
 			justify-content: space-between;
@@ -86,7 +168,7 @@
 		
 		.header-middle {
 			display: flex;
-			margin-left: 100px;
+			/* margin-left: 100px; */
 			align-items: center;
 			justify-content: center;
 		}
