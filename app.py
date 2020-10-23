@@ -52,6 +52,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80))
     profile_pic = db.Column(db.String(20), nullable=False, default='default.jpg')
     posts = db.relationship('Post', backref='owner', lazy=True)
+    sender = db.relationship('Message.sender_id', backref='sender', lazy='dynamic')
+    receiver = db.relationship('Message.receiver_id', backref='receiver', lazy='dynamic')
     liked_post = db.relationship('LikePost', backref='liker', lazy=True)
     bio_content = db.Column(db.String(1000))
 
@@ -77,11 +79,17 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
-
 class LikePost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    body = db.Column(db.String(140))
 
 
 # Forms
@@ -145,7 +153,7 @@ def dashboard():
     posts = Post.query.all()
 
 
-    return render_template('dashboard.html', posts=posts, title='Dashboard', total=total)
+    return render_template('dashboard.html', posts=posts, title='Dashboard')
 
 
 @app.route('/1')
@@ -309,18 +317,24 @@ def specific_post(post_id):
 def like_post(post_id):
     post = Post.query.get_or_404(post_id)
     post_like = LikePost(liker=current_user, liked=post)
+    posts = LikePost.query.filter_by(liker=current_user).all()
     db.session.add(post_like)
     db.session.commit()
 
-    global total
     total = 0
-    for i in post_like:
+    for i in posts:
         total += 1
 
 
     return redirect(url_for('dashboard'))
 
 
+
+@app.route('/users/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    return render_template('user.html', user=user)
 
 
 

@@ -1,0 +1,141 @@
+{% block title %}{% endblock %}
+{% block head %}
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>PicShare - {{ user.username }} </title>
+	<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+	<!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> -->
+{% endblock %}
+{% block content %}
+
+	<div class="nav-bar">
+
+		<div class='header'>
+			<a href='/dashboard'><h3>PicShare</h3></a>
+
+		</div>
+
+		<div class='header-middle'>
+			<input type='text' placeholder='Search...'>
+		</div>
+
+		<div class='header-right'>
+			<a href='#'><i class="fas fa-home"></i></a>
+			<a href='/post'><i class="fas fa-plus-square"></i></a>
+			<a href='/account'><i class="fas fa-user-circle"></i></a>
+			<a href='/logout'><i class="fas fa-sign-out-alt"></i></a>
+		</div>
+
+	</div>
+	<hr>
+
+	<div class='user'>
+		<div class='user-info'>
+
+
+			<div class='profile-pic'>
+				<img src='../static/profile_pics/{{ user.profile_pic }}'>
+			</div>
+
+			<div class='user-account-info'>
+				<h4>{{ user.username }}</h4>
+				<p>{{ user.bio_content }}</p>
+			</div>
+
+			
+		</div>
+	</div>
+
+
+
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+		* {
+			margin: 0;
+			font-family: 'Roboto', sans-serif;
+		}
+
+		a {
+			text-decoration: none;
+			color: black;
+
+		}
+
+		hr {
+			height: 1px;
+			border: 0;
+			background-color: lightgray;
+
+		}
+
+		.user {
+			display: flex;
+		}
+
+		.user-info {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-left: 30%;
+			margin-right: 30%;
+			margin-top: 40px;
+		}
+
+		.user-account-info {
+			display: flex;
+			flex-direction: column;
+			margin-left: 100px;
+			margin-bottom: 40px;
+		}
+
+		.profile-pic > img {
+			height: 110px;
+			width: 110px;
+			border-radius: 50%;
+			object-fit: cover;
+		}
+
+		.nav-bar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			height: 50px;
+			position: sticky;
+			z-index: infinite;
+			background-color: white;
+		}
+
+		.header {
+			padding-left: 200px;
+		}
+
+		.header-right {
+			padding-right: 200px;
+		}
+
+		.header-right > a {
+			font-size: 23px;
+			margin-right: 20px;
+		}
+		
+		.header-middle {
+			display: flex;
+			margin-left: 100px;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.header-middle > input {
+			padding-left: 10px;
+			height: 30px;
+			width: 190px;
+			border: 1px solid lightgray;
+			border-radius: 3px;
+			display: flex;
+		}
+
+
+	</style>
+
+{% endblock %}
