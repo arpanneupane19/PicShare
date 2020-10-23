@@ -53,12 +53,12 @@ class User(db.Model, UserMixin):
     profile_pic = db.Column(db.String(20), nullable=False, default='default.jpg')
 
     posts = db.relationship('Post', backref='owner', lazy='dynamic')
-    messages_sent = db.relationship('Message',
+    sender = db.relationship('Message',
                                     foreign_keys='Message.sender_id',
-                                    backref='author', lazy='dynamic')
-    messages_received = db.relationship('Message',
+                                    backref='sender', lazy='dynamic')
+    receiver = db.relationship('Message',
                                         foreign_keys='Message.receiver_id',
-                                        backref='recipient', lazy='dynamic')
+                                        backref='receiver', lazy='dynamic')
 
     liked_post = db.relationship('LikePost', backref='liker', lazy='dynamic')
 
@@ -155,7 +155,7 @@ class UpdateAccount(FlaskForm):
 
 
 class MessageForm(FlaskForm):
-    message = TextAreaField(validators=[InputRequired(), Length(min=0, max=1000)], render_kw={"placeholder": "Message"})
+    message = TextAreaField(validators=[InputRequired(), Length(min=0, max=140)], render_kw={"placeholder": "Message"})
     send = SubmitField("Send")
 
 
@@ -348,19 +348,23 @@ def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     return render_template('user.html', user=user)
 
-@app.route('/message/<receiver>')
+
+
+@app.route('/message/<receiver>', methods=['GET', "POST"])
 @login_required
 def message(receiver):
-    messages = Message.query.all()
     user = User.query.filter_by(username=receiver).first_or_404()
     form = MessageForm()
-    if form.validate_on_submit():
-        new_message = Message(sender=current_user, receiver=user, body=form.message.data)
-        db.session.add(new_message)
-        db.session.commit()
-        return redirect(url_for('message'))
 
-    return render_template('message.html', form=form)
+    if form.validate_on_submit():
+        message = Message(sender=current_user, receiver=user, body=form.message.data)
+        db.session.add(message)
+        db.session.commit()
+        return redirect(request.url)
+    messages = Message.query.filter_by(sender=current_user, receiver=user)
+
+
+    return render_template('message.html', form=form, user=user, messages=messages)
 
 
 

@@ -30,6 +30,33 @@
 	<hr>
 
 
+	<div class='message'>
+		<div class='message-box'>
+			<div class="message-box-top">
+				<p>Messaging: {{ user.username }}</p>
+			</div>
+
+			<div class='message-middle'>
+				{% for i in messages %}
+					<p>{{ i.body }}</p>
+				{% endfor %}
+
+		
+			</div>
+
+
+			<form method='POST' action=''>
+				<div class='edit-account'>
+						{{form.hidden_tag()}}
+						{{form.message()}}
+						<div class='submit'>{{form.send}}</div>
+				</div>
+			</form>
+
+		</div>
+	</div>
+
+
 
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
@@ -45,11 +72,22 @@
 
 		}
 
+
 		hr {
 			height: 1px;
 			border: 0;
 			background-color: lightgray;
 
+		}
+
+		.message-box {
+			border: 1px solid lightgray;
+			padding-bottom: 400px;
+			margin-left: 6%;
+			margin-right: 6%;
+			margin-top: 60px;
+			display: flex;
+			flex-direction: column;
 		}
 		
 		.nav-bar {
