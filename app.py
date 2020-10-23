@@ -148,6 +148,13 @@ def dashboard():
     return render_template('dashboard.html', posts=posts, title='Dashboard', total=total)
 
 
+@app.route('/1')
+@login_required
+def dashboard_redirect():
+
+    return redirect(url_for('dashboard'))
+
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
@@ -158,7 +165,7 @@ def home():
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
-                return redirect(url_for("dashboard"))
+                return redirect(url_for("dashboard_redirect"))
         flash('User does not exist or invalid password.')
     return render_template('home.html', form=form)
 
@@ -302,14 +309,15 @@ def specific_post(post_id):
 def like_post(post_id):
     post = Post.query.get_or_404(post_id)
     post_like = LikePost(liker=current_user, liked=post)
-    likes = LikePost.query.filter_by(liked=post).all()
     db.session.add(post_like)
     db.session.commit()
 
     global total
     total = 0
-    for i in likes:
+    for i in post_like:
         total += 1
+
+
     return redirect(url_for('dashboard'))
 
 
