@@ -37,8 +37,11 @@
 			</div>
 
 			<div class='message-middle'>
-				{% for i in messages %}
-					<p>{{ i.body }}</p>
+				{% for i in messages_received %}
+					<p>{{ i.sender.username }}: {{ i.body }}</p>
+				{% endfor %}
+				{% for i in messages_sent %}
+					<p>{{ i.sender.username }}: {{ i.body }}</p>
 				{% endfor %}
 
 		

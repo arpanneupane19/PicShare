@@ -355,16 +355,19 @@ def user(username):
 def message(receiver):
     user = User.query.filter_by(username=receiver).first_or_404()
     form = MessageForm()
+    if receiver == current_user.username:
+        return redirect(url_for('dashboard'))
 
     if form.validate_on_submit():
         message = Message(sender=current_user, receiver=user, body=form.message.data)
         db.session.add(message)
         db.session.commit()
         return redirect(request.url)
-    messages = Message.query.filter_by(sender=current_user, receiver=user)
+    messages_received = Message.query.filter_by(sender=user, receiver=current_user).all()
+    messages_sent = Message.query.filter_by(sender=current_user, receiver=user).all()
 
 
-    return render_template('message.html', form=form, user=user, messages=messages)
+    return render_template('message.html', form=form, user=user, messages_received=messages_received, messages_sent=messages_sent)
 
 
 
