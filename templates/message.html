@@ -31,15 +31,22 @@
 
 
 	<div class='message'>
+
 		<div class='message-box'>
 			<div class="message-box-top">
-				<p>Messaging: {{ user.username }}</p>
+			<p>Messaging: {{ user.username }}</p>
+
 			</div>
 
 			<div class='message-middle'>
 				{% for i in messages_received %}
 					<p>{{ i.sender.username }}: {{ i.body }}</p>
 				{% endfor %}
+
+				<div class='sent'>
+				</div>
+			
+				
 				{% for i in messages_sent %}
 					<p>{{ i.sender.username }}: {{ i.body }}</p>
 				{% endfor %}
@@ -49,10 +56,10 @@
 
 
 			<form method='POST' action=''>
-				<div class='edit-account'>
+				<div class='send-message'>
 						{{form.hidden_tag()}}
 						{{form.message()}}
-						<div class='submit'>{{form.send}}</div>
+						<div class='send'>{{form.send}}</div>
 				</div>
 			</form>
 
@@ -93,6 +100,33 @@
 			flex-direction: column;
 		}
 		
+
+		.send-message {
+			display: flex
+		}
+		.send-message > textarea {
+			max-width: 270px;
+			min-width: 270px;
+			border: 1px solid lightgray;
+			padding: 5px;
+			margin-bottom: 10px;
+			min-height: 30px;
+			height: 30px;
+			border-radius: 3px;
+		}
+
+		.send > input {
+			height: 30px;
+			width: 50px;
+			cursor: pointer;
+			background-color: #0088ff;
+			border: none;
+			color: white;
+			border-radius: 3px;
+			margin-bottom: 50px;
+		}
+
+
 		.nav-bar {
 			display: flex;
 			justify-content: space-between;
@@ -104,21 +138,24 @@
 		}
 
 		.header {
-			padding-left: 200px;
+			margin-right: 150px;
+			padding-left: 50px;
 		}
 
 		.header-right {
-			padding-right: 200px;
+			margin-left: 100px;
+			margin-right: 50px;
+			display: flex;
 		}
 
 		.header-right > a {
 			font-size: 23px;
 			margin-right: 20px;
+			display: flex;
 		}
 		
 		.header-middle {
 			display: flex;
-			margin-left: 100px;
 			align-items: center;
 			justify-content: center;
 		}
@@ -131,6 +168,7 @@
 			border-radius: 3px;
 			display: flex;
 		}
+
 
 
 	</style>
