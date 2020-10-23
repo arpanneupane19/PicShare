@@ -51,10 +51,17 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(40), unique=True)
     password = db.Column(db.String(80))
     profile_pic = db.Column(db.String(20), nullable=False, default='default.jpg')
-    posts = db.relationship('Post', backref='owner', lazy=True)
-    sender = db.relationship('Message.sender_id', backref='sender', lazy='dynamic')
-    receiver = db.relationship('Message.receiver_id', backref='receiver', lazy='dynamic')
-    liked_post = db.relationship('LikePost', backref='liker', lazy=True)
+
+    posts = db.relationship('Post', backref='owner', lazy='dynamic')
+    messages_sent = db.relationship('Message',
+                                    foreign_keys='Message.sender_id',
+                                    backref='author', lazy='dynamic')
+    messages_received = db.relationship('Message',
+                                        foreign_keys='Message.receiver_id',
+                                        backref='recipient', lazy='dynamic')
+
+    liked_post = db.relationship('LikePost', backref='liker', lazy='dynamic')
+
     bio_content = db.Column(db.String(1000))
 
 
@@ -145,6 +152,11 @@ class UpdateAccount(FlaskForm):
             email = User.query.filter_by(email=email.data).first()
             if email:
                 raise ValidationError("That email address belongs to different user. Please choose a different one.")
+
+
+class MessageForm(FlaskForm):
+    message = TextAreaField(validators=[InputRequired(), Length(min=0, max=1000)], render_kw={"placeholder": "Message"})
+    send = SubmitField("Send")
 
 
 @app.route('/dashboard')
@@ -335,6 +347,22 @@ def like_post(post_id):
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     return render_template('user.html', user=user)
+
+@app.route('/message/<receiver>')
+@login_required
+def message(receiver):
+    messages = Message.query.all()
+    user = User.query.filter_by(username=receiver).first_or_404()
+    form = MessageForm()
+    if form.validate_on_submit():
+        new_message = Message(sender=current_user, receiver=user, body=form.message.data)
+        db.session.add(new_message)
+        db.session.commit()
+        return redirect(url_for('message'))
+
+    return render_template('message.html', form=form)
+
+
 
 
 

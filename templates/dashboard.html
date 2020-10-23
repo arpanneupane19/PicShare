@@ -37,14 +37,8 @@
 			<div class='profile-pic-username'>
 				<img src="../static/profile_pics/{{ post.owner.profile_pic }}" width="50" height="50">
 
-				<p>{{ post.owner.username }}</p>
-				<!-- <div class='w3-dropdown-hover'>
-					<button class="w3-button w3-white"><i class="fas fa-ellipsis-h"></i></button>
-					<div class="w3-dropdown-content w3-bar-block w3-border">
-						<a href="#" class="w3-bar-item w3-button">Update Post</a>
-						<a href="#" class="w3-bar-item w3-button">Delete Post</a>
-					</div>
-				</div> -->
+				<a href="{{ url_for('user', username=post.owner.username)}}">{{ post.owner.username }}</p>
+
 			</div>
 
 			<div class="post-image">
@@ -132,7 +126,7 @@
 			margin-bottom: 10px;
 		}
 
-		.profile-pic-username > p {
+		.profile-pic-username > a {
 			margin-top: 15px;
 			margin-left: 10px;
 		}
