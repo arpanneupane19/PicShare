@@ -2,8 +2,10 @@
 {% block head %}
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>PicShare - Home</title>
+	<title>PicShare - My account</title>
 	<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+	<link rel="stylesheet" href="../static/styles.css">
+
 {% endblock %}
 {% block content %}
 
@@ -31,9 +33,9 @@
 
 
 
-	<div class='account-box'>
+	<div class='account'>
 
-		<div class='account-box-top'>
+		<div class='account-box'>
 			<div class='username-photo'>
 				<img src='{{ profile_pic }}' width="50" height="50">
 				<div class='post-total-username'>
@@ -41,7 +43,6 @@
 					<p>Number of posts: {{ posts_num }}</p>
 				</div>
 			</div>
-		</div>
 
 		<div class='message-flash'>
 			{% with messages = get_flashed_messages(with_categories=true) %}
@@ -68,174 +69,11 @@
 		</div>
 		</form>
 
+		</div>
 		
 	</div>
 
 
 
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
-
-		* {
-			margin: 0;
-			font-family: 'Roboto', sans-serif;
-		}
-
-		a {
-			text-decoration: none;
-			color: black;
-
-		}
-
-		hr {
-			height: 1px;
-			border: 0;
-			background-color: lightgray;
-
-		}
-		.nav-bar {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			height: 50px;
-			position: sticky;
-			z-index: infinite;
-			background-color: white;
-		}
-
-		.header {
-			margin-right: 150px;
-			padding-left: 50px;
-		}
-
-		.header-right {
-			margin-left: 100px;
-			margin-right: 50px;
-			display: flex;
-		}
-
-		.header-right > a {
-			font-size: 23px;
-			margin-right: 20px;
-			display: flex;
-		}
-		
-		.header-middle {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		.header-middle > input {
-			padding-left: 10px;
-			height: 30px;
-			width: 190px;
-			border: 1px solid lightgray;
-			border-radius: 3px;
-			display: flex;
-		}
-
-
-
-		.account-box {
-			border: 1px solid lightgray;
-			border-radius: 3px;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			margin-top: 50px;
-			width: 300px;
-			margin-left: 550px;
-
-		}
-
-		.account-box-top {
-			display: flex;
-			flex-direction: column;
-			margin-top: 25px;
-			margin-bottom: 30px;
-			justify-content: center;
-			align-items: center;
-
-		}
-
-		.message-flash {
-			color: white;
-			background-color: #0088ff;
-
-			border-radius: 3px;
-			text-align: center;
-			margin-bottom: 10px;
-			margin-left: 30%;
-			margin-right: 30%;
-		}
-
-		.username-photo {
-			display: flex;
-		}
-
-		.profile-pic {
-			padding: 5px;
-			border: 1px solid lightgray;
-			border-radius: 3px;
-			margin-bottom: 10px;
-			width: 260px;
-		}
-
-		.post-total-username {
-			margin-top: 15px;
-			margin-left: 10px;
-			padding: 0;
-		}
-
-		.post-total-username > p{
-			font-size: 13px;
-		}
-
-		.username-photo > img {
-			border-radius: 50px;
-		}
-
-		.edit-account {
-			display: flex;
-			border-radius: 3px;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-		}
-
-		.edit-account > input{
-			margin-bottom: 10px;
-			height: 35px;
-			width: 270px;
-			border: 1px solid lightgray;
-			border-radius: 3px;
-			padding-left: 10px;
-		}
-
-		.bio > textarea {
-			max-width: 270px;
-			min-width: 270px;
-			border: 1px solid lightgray;
-			padding: 10px;
-			margin-bottom: 10px;
-			min-height: 35px;
-			height: 35px;
-			border-radius: 3px;
-		}
-
-		.submit > input{
-			height: 30px;
-			width: 270px;
-			cursor: pointer;
-			background-color: #0088ff;
-			border: none;
-			color: white;
-			border-radius: 3px;
-			margin-bottom: 50px;
-		}
-
-	</style>
 
 {% endblock %}

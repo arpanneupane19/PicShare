@@ -4,7 +4,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>PicShare - Home</title>
 	<script src="https://kit.fontawesome.com/a076d05399.js"></script>
-	<!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> -->
+	<link rel="stylesheet" href="../static/styles.css">
 {% endblock %}
 {% block content %}
 
@@ -29,6 +29,17 @@
 	</div>
 	<hr>
 
+	<div class='message-flash'>
+		{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+			{% for category, message in messages %}
+				<div class="alert alert-{{ category }}">
+				{{ message }}
+				</div>
+			{% endfor %}
+		{% endif %}
+		{% endwith %}
+	</div>
 
 	{% for post in posts %}
 	<div class='post'>
@@ -43,15 +54,22 @@
 
 			<div class="post-image">
 				<a href='#'><img src='../static/pictures/{{ post.picture }}'></a>
-
 			</div>
 
 		
 			<div class='post-info'>
-				<p>{{ total }}</p>
+				<p>{{ post.likes }}</p>
 				<div class='icons'>
-					<a href="{{ url_for('like_post', post_id=post.id) }}"><i class="fas fa-heart"></i></a>
+					<a href="#"><i class="fas fa-heart"></i></a>
 					<a href='#'><i class="fas fa-comment"></i></a>
+
+					{% if current_user == post.owner %}
+					<div class='modify'>
+						<a href="{{ url_for('delete_post', post_id=post.id)}}">Delete</a>
+						<a href='#'>Update</a>
+					</div>
+					{% else %}
+					{% endif %}
 				</div>
 	
 				<div class='caption'>
@@ -63,134 +81,5 @@
 	
 	</div>
 	{% endfor %}
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
-
-		* {
-			margin: 0;
-			font-family: 'Roboto', sans-serif;
-		}
-
-		a {
-			text-decoration: none;
-			color: black;
-
-		}
-
-		hr {
-			height: 1px;
-			border: 0;
-			background-color: lightgray;
-
-		}
-
-		.post {
-			display: flex;
-			flex-direction: column;
-			margin-top: 40px;
-			justify-content: center;
-			align-items: center;
-			margin-bottom: 40px;
-		}
-		
-
-		.post-info {
-			margin-left: 10px;
-			display: flex;
-			flex-direction: column;
-		}
-
-
-		.icons > a{
-			font-size: larger;
-			margin-right: 10px;
-		}
-
-		.post-content {
-			border: 1px solid lightgray;
-			padding-top: 10px;
-			padding-bottom: 10px;
-		}
-
-
-		.post-image > a > img{
-			width: 600px;
-			height: 400px;
-			object-fit: cover;
-
-			margin-bottom: 20px;
-		}
-
-		.profile-pic-username {
-			border-radius: 50%;
-			display: flex;
-			margin-bottom: 10px;
-		}
-
-		.profile-pic-username > a {
-			margin-top: 15px;
-			margin-left: 10px;
-		}
-
-		.profile-pic-username > img {
-			border-radius: 50%;
-			/* cursor: pointer; */
-			margin-left: 10px;
-		}
-
-		.w3-dropdown-hover {
-			margin-top: 15px;
-			margin-left: 380px;
-			background-color: white;
-		}
-
-
-		.caption {
-			margin-top: 20px;
-		}
-		.nav-bar {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			height: 50px;
-			position: sticky;
-			z-index: infinite;
-			background-color: white;
-		}
-
-		.header {
-			margin-right: 150px;
-			padding-left: 50px;
-		}
-
-		.header-right {
-			margin-left: 100px;
-			margin-right: 50px;
-			display: flex;
-		}
-
-		.header-right > a {
-			font-size: 23px;
-			margin-right: 20px;
-			display: flex;
-		}
-		
-		.header-middle {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		.header-middle > input {
-			padding-left: 10px;
-			height: 30px;
-			width: 190px;
-			border: 1px solid lightgray;
-			border-radius: 3px;
-			display: flex;
-		}
-
-
-	</style>
 
 {% endblock %}

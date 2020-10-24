@@ -60,11 +60,28 @@ class User(db.Model, UserMixin):
                                         foreign_keys='Message.receiver_id',
                                         backref='receiver', lazy='dynamic')
 
-    liked_post = db.relationship('LikePost', backref='liker', lazy='dynamic')
+    liked = db.relationship('LikePost', foreign_keys='LikePost.user_id', backref='liker', lazy='dynamic')
 
     bio_content = db.Column(db.String(1000))
 
 
+    def like_post(self, post):
+            if not self.has_liked_post(post):
+                like = LikePost(user_id=self.id, post_id=post.id)
+                db.session.add(like)
+
+    def unlike_post(self, post):
+        if self.has_liked_post(post):
+            LikePost.query.filter_by(
+                user_id=self.id,
+                post_id=post.id).delete()
+
+    def has_liked_post(self, post):
+        return LikePost.query.filter(
+            LikePost.user_id == self.id,
+            LikePost.post_id == post.id).count() > 0
+
+            
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
         return s.dumps({'user_id': self.id}).decode('utf-8')
@@ -82,14 +99,16 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     caption = db.Column(db.String(100), nullable=False)
     picture = db.Column(db.String(20), nullable=False)
-    likes = db.relationship('LikePost', backref='liked', lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
+    likes = db.relationship('LikePost', backref='liked', lazy='dynamic')
 
 class LikePost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    post = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+
+
+
 
 
 class Message(db.Model):
@@ -182,6 +201,8 @@ def home():
                 login_user(user)
                 return redirect(url_for("dashboard"))
         flash('User does not exist or invalid password.')
+
+
     return render_template('home.html', form=form)
 
 
@@ -224,6 +245,8 @@ def save_profile_pic(form_profile_pic):
     i.thumbnail(output_size)
     i.save(picture_path)
     return picture_name
+
+
 
 
 @app.route('/account', methods=['GET', 'POST'])
@@ -312,28 +335,32 @@ def create_post():
     return render_template('create_post.html', form=form)
 
 
+def delete_picture(post_picture):
+    post_path = os.path.join(app.root_path, 'static/pictures', post_picture)
+    os.remove(post_path)
+
+
+@app.route('/delete/<int:post_id>')
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.owner != current_user:
+        abort(403)
+    else:
+        delete_picture(post.picture)
+        db.session.delete(post)
+        db.session.commit()
+        flash('Your post has been deleted and is not viewable by anyone.')
+        return redirect(url_for('dashboard'))
+
+
 @app.route('/post/<int:post_id>')
 @login_required
 def specific_post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('specific_post.html')
+    return render_template('specific_post.html', post=post)
 
 
-@app.route('/post/like/<int:post_id>')
-@login_required
-def like_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    post_like = LikePost(liker=current_user, liked=post)
-    posts = LikePost.query.filter_by(liker=current_user, liked=post).all()
-    db.session.add(post_like)
-    db.session.commit()
-
-    total = 0
-    for i in posts:
-        total += 1
-
-
-    return redirect(url_for('dashboard'))
 
 
 
@@ -353,11 +380,15 @@ def message(receiver):
     if receiver == current_user.username:
         return redirect(url_for('dashboard'))
 
+
     if form.validate_on_submit():
         message = Message(sender=current_user, receiver=user, body=form.message.data)
         db.session.add(message)
         db.session.commit()
-        return redirect(request.url)
+
+        if db.session.commit():
+            return redirect(request.url)
+
     messages_received = Message.query.filter_by(sender=user, receiver=current_user).all()
     messages_sent = Message.query.filter_by(sender=current_user, receiver=user).all()
 
