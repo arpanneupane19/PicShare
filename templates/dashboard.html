@@ -48,20 +48,29 @@
 			<div class='profile-pic-username'>
 				<img src="../static/profile_pics/{{ post.owner.profile_pic }}" width="50" height="50">
 
-				<a href="{{ url_for('user', username=post.owner.username)}}">{{ post.owner.username }}</p>
-
+				<a href="{{ url_for('user', username=post.owner.username)}}"><p>{{ post.owner.username }}</p></a>
 			</div>
 
+			
 			<div class="post-image">
-				<a href='#'><img src='../static/pictures/{{ post.picture }}'></a>
+				<img src='../static/pictures/{{ post.picture }}'>
 			</div>
 
-		
+
+
 			<div class='post-info'>
-				<p>{{ post.likes }}</p>
+				{% if post.likes.count() == 1 %}
+					<p>{{ post.likes.count() }} like</p><br>
+				{% else %}
+					<p>{{ post.likes.count() }} likes</p><br>
+				{% endif %}
 				<div class='icons'>
-					<a href="#"><i class="fas fa-heart"></i></a>
-					<a href='#'><i class="fas fa-comment"></i></a>
+					{% if current_user.has_liked_post(post) %}
+						<a href="{{ url_for('like_action', post_id=post.id, action='unlike') }}"><i class="fas fa-heart"></i></a>
+				  	{% else %}
+						<a 	href="{{ url_for('like_action', post_id=post.id, action='like') }}"><i class="far fa-heart"></i></a>
+				  	{% endif %}
+
 
 					{% if current_user == post.owner %}
 					<div class='modify'>
@@ -81,5 +90,7 @@
 	
 	</div>
 	{% endfor %}
+
+
 
 {% endblock %}

@@ -60,7 +60,7 @@ class User(db.Model, UserMixin):
                                         foreign_keys='Message.receiver_id',
                                         backref='receiver', lazy='dynamic')
 
-    liked = db.relationship('LikePost', foreign_keys='LikePost.user_id', backref='liker', lazy='dynamic')
+    liked = db.relationship('LikePost', backref='liker', lazy='dynamic')
 
     bio_content = db.Column(db.String(1000))
 
@@ -102,13 +102,11 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     likes = db.relationship('LikePost', backref='liked', lazy='dynamic')
 
+
 class LikePost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
-
-
-
 
 
 class Message(db.Model):
@@ -361,8 +359,27 @@ def specific_post(post_id):
     return render_template('specific_post.html', post=post)
 
 
+@app.route('/like/<int:post_id>/<action>')
+@login_required
+def like_action(post_id, action):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    if action == 'like':
+        current_user.like_post(post)
+        db.session.commit()
+    if action == 'unlike':
+        current_user.unlike_post(post)
+        db.session.commit()
+
+    
+    return redirect(request.referrer)
 
 
+@app.route('/post/<int:post_id>/liked-by')
+@login_required
+def liked_by(post_id):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    likers = User.query.filter_by(likers=post).all()
+    return render_template('likes.html', post=post, likers=likers)
 
 @app.route('/users/<username>')
 @login_required

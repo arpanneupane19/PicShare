@@ -431,11 +431,10 @@ hr {
 }
 
 
-.post-image > a > img{
+.post-image > img{
 	width: 495px;
 	height: 500px;
 	object-fit: cover;
-	cursor: auto;
 	margin-bottom: 20px;
 }
 
