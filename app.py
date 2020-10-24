@@ -53,6 +53,7 @@ class User(db.Model, UserMixin):
     profile_pic = db.Column(db.String(20), nullable=False, default='default.jpg')
 
     posts = db.relationship('Post', backref='owner', lazy='dynamic')
+
     sender = db.relationship('Message',
                                     foreign_keys='Message.sender_id',
                                     backref='sender', lazy='dynamic')
@@ -62,19 +63,21 @@ class User(db.Model, UserMixin):
 
     liked = db.relationship('LikePost', backref='liker', lazy='dynamic')
 
+    follower = db.relationship('Follow',
+                                    foreign_keys='Follow.follower_id',
+                                    backref='follower', lazy='dynamic')
+    followed = db.relationship('Follow',
+                                        foreign_keys='Follow.followed_id',
+                                        backref='followed', lazy='dynamic')
+
+
     bio_content = db.Column(db.String(1000))
 
+    def is_following(self, user):
+        return Follow.query.filter(
+            Follow.follower_id == self.id,
+            Follow.followed_id == user.id).count() > 0
 
-    def like_post(self, post):
-            if not self.has_liked_post(post):
-                like = LikePost(user_id=self.id, post_id=post.id)
-                db.session.add(like)
-
-    def unlike_post(self, post):
-        if self.has_liked_post(post):
-            LikePost.query.filter_by(
-                user_id=self.id,
-                post_id=post.id).delete()
 
     def has_liked_post(self, post):
         return LikePost.query.filter(
@@ -107,6 +110,14 @@ class LikePost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+
+
+
+class Follow(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    follower_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    followed_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 
 
 class Message(db.Model):
@@ -176,7 +187,7 @@ class MessageForm(FlaskForm):
     send = SubmitField("Send")
 
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     posts = Post.query.all()
@@ -316,6 +327,7 @@ def save_picture(form_picture):
     return picture_name
 
 
+
 @app.route('/post', methods=['GET', 'POST'])
 @login_required
 def create_post():
@@ -364,28 +376,52 @@ def specific_post(post_id):
 def like_action(post_id, action):
     post = Post.query.filter_by(id=post_id).first_or_404()
     if action == 'like':
-        current_user.like_post(post)
+        new_like = LikePost(liker=current_user, liked=post)
+        db.session.add(new_like)
         db.session.commit()
+
     if action == 'unlike':
-        current_user.unlike_post(post)
+        like = LikePost.query.filter_by(liker=current_user, liked=post).delete()
         db.session.commit()
 
     
     return redirect(request.referrer)
 
 
-@app.route('/post/<int:post_id>/liked-by')
+@app.route('/<action>/<username>', methods=['GET', 'POST'])
 @login_required
-def liked_by(post_id):
-    post = Post.query.filter_by(id=post_id).first_or_404()
-    likers = User.query.filter_by(likers=post).all()
-    return render_template('likes.html', post=post, likers=likers)
+def follow(action, username):
+    user = User.query.filter_by(username=username).first()
+    if action == 'follow':
+        if current_user.username == user.username:
+            flash('You cannot follow yourself.')
+            return redirect(url_for('dashboard'))
+        follow = Follow(follower=current_user, followed=user)
+        db.session.add(follow)
+        db.session.commit()
+        flash('Followed')
+        return redirect(url_for('dashboard'))
+
+    if action == 'unfollow':
+        follow = Follow.query.filter_by(follower=current_user, followed=user).delete()
+        flash('Unfollowed')
+        db.session.commit()
+        return redirect(url_for('dashboard'))
+
+
+       
+
 
 @app.route('/users/<username>')
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user)
+
+    all_followers = Follow.query.filter_by(followed=user).all()
+    total = 0
+    for i in all_followers:
+        total += 1
+    return render_template('user.html', user=user, total=total)
 
 
 

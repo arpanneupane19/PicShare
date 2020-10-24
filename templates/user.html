@@ -4,7 +4,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>PicShare - {{ user.username }} </title>
 	<script src="https://kit.fontawesome.com/a076d05399.js"></script>
-	<!-- <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> -->
+	<link rel='stylesheet' href='../static/styles.css'>
 {% endblock %}
 {% block content %}
 
@@ -37,8 +37,22 @@
 				<img src='../static/profile_pics/{{ user.profile_pic }}'>
 			</div>
 
-			<div class='user-account-info'>
+			<div class='user-profile-info'>
 				<h4>{{ user.username }}</h4>
+				{% if total == 1 %}
+					<p>{{ total }} follower</p>
+				{% else %}
+					<p>{{ total }} followers</p>
+				{% endif %}
+
+				{% if user.username == current_user.username %}
+				{% else %}
+				{% if current_user.is_following(user) %}
+					<a href="{{ url_for('follow', username=user.username, action='unfollow')}}">Unfollow</a>
+				{% else %}
+					<a href="{{ url_for('follow', username=user.username, action='follow')}}">Follow</a>
+				{% endif %}
+				{% endif %}
 				{% if user.username == current_user.username %}
 				{% else %}
 				<a href="{{ url_for('message', receiver=user.username )}}">Message</a>
@@ -90,7 +104,7 @@
 			margin-top: 40px;
 		}
 
-		.user-account-info {
+		.user-profile-info {
 			display: flex;
 			flex-direction: column;
 			margin-left: 100px;
@@ -102,45 +116,6 @@
 			width: 110px;
 			border-radius: 50%;
 			object-fit: cover;
-		}
-
-		.nav-bar {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			height: 50px;
-			position: sticky;
-			z-index: infinite;
-			background-color: white;
-		}
-
-		.header {
-			padding-left: 200px;
-		}
-
-		.header-right {
-			padding-right: 200px;
-		}
-
-		.header-right > a {
-			font-size: 23px;
-			margin-right: 20px;
-		}
-		
-		.header-middle {
-			display: flex;
-			margin-left: 100px;
-			align-items: center;
-			justify-content: center;
-		}
-
-		.header-middle > input {
-			padding-left: 10px;
-			height: 30px;
-			width: 190px;
-			border: 1px solid lightgray;
-			border-radius: 3px;
-			display: flex;
 		}
 
 
