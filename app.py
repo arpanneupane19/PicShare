@@ -187,6 +187,11 @@ class MessageForm(FlaskForm):
     send = SubmitField("Send")
 
 
+class UpdatePost(FlaskForm):
+    caption = TextAreaField(validators=[InputRequired(), Length(min=0, max=1000)], render_kw={"placeholder": "Update caption"})
+    submit = SubmitField('Update Post')
+
+
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
@@ -350,7 +355,7 @@ def delete_picture(post_picture):
     os.remove(post_path)
 
 
-@app.route('/delete/<int:post_id>')
+@app.route('/delete/<int:post_id>', methods=['GET',"POST"])
 @login_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
@@ -362,6 +367,23 @@ def delete_post(post_id):
         db.session.commit()
         flash('Your post has been deleted and is not viewable by anyone.')
         return redirect(url_for('dashboard'))
+
+
+@app.route('/update/<int:post_id>', methods=['GET','POST'])
+@login_required
+def update_post(post_id):
+    post = Post.query.get_or_404(post_id)
+
+    form = UpdatePost()
+    if form.validate_on_submit():
+        post.caption = form.caption.data
+        db.session.commit()
+        return redirect(url_for('dashboard'))
+    elif request.method == 'GET':
+        form.caption.data = post.caption
+    flash('Your post has been updated!')
+    return render_template('update_post.html', form=form, post=post)
+
 
 
 @app.route('/post/<int:post_id>')
@@ -396,7 +418,7 @@ def follow(action, username):
         if current_user.username == user.username:
             flash('You cannot follow yourself.')
             return redirect(url_for('dashboard'))
-        follow = Follow(follower=current_user, followed=user)
+        follow = Follow(follower=current_user, followed=user) # following=user not username because I spent one hour fixing this line lol.
         db.session.add(follow)
         db.session.commit()
         flash('Followed')

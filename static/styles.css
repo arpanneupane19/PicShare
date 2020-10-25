@@ -164,8 +164,19 @@ hr {
 		justify-content: center;
 		align-items: center;
 		width: 300px;
-		margin-left: 100px;
+		margin-left: 0px;
 	}
+
+	.dashboard-post {
+		display: flex;
+		flex-direction: column;
+		margin-top: 40px;
+		justify-content: center;
+		align-items: center;
+		margin-bottom: 40px;
+		width: 300px;
+	}
+	
 
 }
 
@@ -389,20 +400,26 @@ hr {
 	margin-bottom: 50px;
 }
 
-.post {
+
+
+/* Posts that show on dashboard */
+.dashboard-post {
 	display: flex;
 	flex-direction: column;
 	margin-top: 40px;
 	justify-content: center;
 	align-items: center;
 	margin-bottom: 40px;
+	width: 500px;
+	margin-left: 30%;
 }
 
 
-.post-info {
+.dashboard-post-info {
 	margin-left: 10px;
 	display: flex;
 	flex-direction: column;
+
 }
 
 .icons {
@@ -417,22 +434,23 @@ hr {
 .modify {
 	font-size: smaller;
 	margin-top: 3px;
-	margin-left: 320px;
+	margin-left: 360px;
+	display: flex;
 }
 
 .modify > a {
 	margin-left: 5px;
 }
 
-.post-content {
+.dashboard-post-content {
 	border: 1px solid lightgray;
 	padding-top: 10px;
 	padding-bottom: 10px;
 }
 
 
-.post-image > img{
-	width: 495px;
+.dashboard-post-image > img{
+	width: 500px;
 	height: 500px;
 	object-fit: cover;
 	margin-bottom: 20px;
