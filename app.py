@@ -66,9 +66,9 @@ class User(db.Model, UserMixin):
     follower = db.relationship('Follow',
                                     foreign_keys='Follow.follower_id',
                                     backref='follower', lazy='dynamic')
-    followed = db.relationship('Follow',
-                                        foreign_keys='Follow.followed_id',
-                                        backref='followed', lazy='dynamic')
+    following = db.relationship('Follow',
+                                        foreign_keys='Follow.following_id',
+                                        backref='following', lazy='dynamic')
 
 
     bio_content = db.Column(db.String(1000))
@@ -76,7 +76,7 @@ class User(db.Model, UserMixin):
     def is_following(self, user):
         return Follow.query.filter(
             Follow.follower_id == self.id,
-            Follow.followed_id == user.id).count() > 0
+            Follow.following_id == user.id).count() > 0
 
 
     def has_liked_post(self, post):
@@ -116,7 +116,8 @@ class LikePost(db.Model):
 class Follow(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     follower_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    followed_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    following_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 
 
 
@@ -196,7 +197,7 @@ class UpdatePost(FlaskForm):
 @login_required
 def dashboard():
     posts = Post.query.all()
-
+    following_post = ''
 
     return render_template('dashboard.html', posts=posts, title='Dashboard')
 
@@ -418,15 +419,15 @@ def follow(action, username):
         if current_user.username == user.username:
             flash('You cannot follow yourself.')
             return redirect(url_for('dashboard'))
-        follow = Follow(follower=current_user, followed=user) # following=user not username because I spent one hour fixing this line lol.
+        follow = Follow(follower=current_user, following=user) # following=user not username because I spent one hour fixing this line lol.
         db.session.add(follow)
         db.session.commit()
-        flash('Followed')
+        flash('following')
         return redirect(url_for('dashboard'))
 
     if action == 'unfollow':
-        follow = Follow.query.filter_by(follower=current_user, followed=user).delete()
-        flash('Unfollowed')
+        follow = Follow.query.filter_by(follower=current_user, following=user).delete()
+        flash('Unfollowing')
         db.session.commit()
         return redirect(url_for('dashboard'))
 
@@ -439,7 +440,7 @@ def follow(action, username):
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
 
-    all_followers = Follow.query.filter_by(followed=user).all()
+    all_followers = Follow.query.filter_by(following=user).all()
     total = 0
     for i in all_followers:
         total += 1
