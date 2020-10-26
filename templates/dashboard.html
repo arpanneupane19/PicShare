@@ -82,7 +82,11 @@
 				</div>
 	
 				<div class='caption'>
-					<p>{{ post.caption }}</p>
+					<p>{{ post.caption }}</p><br>
+				</div>
+
+				<div class='comment'>
+					<a href="{{ url_for('comment', post_id=post.id)}}">Add a comment...</a>
 				</div>
 			</div>
 

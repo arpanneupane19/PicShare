@@ -70,6 +70,7 @@ class User(db.Model, UserMixin):
                                         foreign_keys='Follow.following_id',
                                         backref='following', lazy='dynamic')
 
+    commenter = db.relationship('Comment', backref='commenter', lazy='dynamic')
 
     bio_content = db.Column(db.String(1000))
 
@@ -104,6 +105,8 @@ class Post(db.Model):
     picture = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     likes = db.relationship('LikePost', backref='liked', lazy='dynamic')
+    comments = db.relationship('Comment', backref='comment', lazy='dynamic')
+
 
 
 class LikePost(db.Model):
@@ -119,6 +122,11 @@ class Follow(db.Model):
     following_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    commenter_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    comment_body = db.Column(db.String(100))
 
 
 class Message(db.Model):
@@ -193,11 +201,16 @@ class UpdatePost(FlaskForm):
     submit = SubmitField('Update Post')
 
 
+class CommentForm(FlaskForm):
+    comment = TextAreaField(validators=[InputRequired(), Length(min=0, max=100)], render_kw={"placeholder": "Add a comment..."})
+    submit = SubmitField('Add')
+
+
+
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     posts = Post.query.all()
-    following_post = ''
 
     return render_template('dashboard.html', posts=posts, title='Dashboard')
 
@@ -379,10 +392,10 @@ def update_post(post_id):
     if form.validate_on_submit():
         post.caption = form.caption.data
         db.session.commit()
+        flash('Your post has been updated!')
         return redirect(url_for('dashboard'))
     elif request.method == 'GET':
         form.caption.data = post.caption
-    flash('Your post has been updated!')
     return render_template('update_post.html', form=form, post=post)
 
 
@@ -411,6 +424,21 @@ def like_action(post_id, action):
     return redirect(request.referrer)
 
 
+@app.route('/comment/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def comment(post_id):
+    post = Post.query.get_or_404(post_id)
+
+    form = CommentForm()
+    if form.validate_on_submit():
+        new_comment = Comment(comment=post, commenter=current_user, comment_body=form.comment.data)
+        db.session.add(new_comment)
+        db.session.commit()
+        return redirect(request.referrer)
+    return render_template('comment.html', form=form)
+
+
+
 @app.route('/<action>/<username>', methods=['GET', 'POST'])
 @login_required
 def follow(action, username):
@@ -430,6 +458,7 @@ def follow(action, username):
         flash('Unfollowing')
         db.session.commit()
         return redirect(url_for('dashboard'))
+
 
 
        
