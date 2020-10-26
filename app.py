@@ -231,6 +231,9 @@ def home():
         flash('User does not exist or invalid password.')
 
 
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
     return render_template('home.html', form=form)
 
 
