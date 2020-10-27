@@ -476,3 +476,7 @@ hr {
 .caption {
 	margin-top: 20px;
 }
+
+.comments-container {
+	text-align: center;
+}

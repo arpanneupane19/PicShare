@@ -380,6 +380,8 @@ def delete_post(post_id):
         abort(403)
     else:
         delete_picture(post.picture)
+        for comment in post.comments:
+            db.session.delete(comment)
         db.session.delete(post)
         db.session.commit()
         flash('Your post has been deleted and is not viewable by anyone.')
@@ -437,7 +439,7 @@ def comment(post_id):
         new_comment = Comment(comment=post, commenter=current_user, comment_body=form.comment.data)
         db.session.add(new_comment)
         db.session.commit()
-        return redirect(request.referrer)
+        return redirect(url_for('dashboard'))
     return render_template('comment.html', form=form)
 
 
