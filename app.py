@@ -441,6 +441,10 @@ def comment(post_id):
     return render_template('comment.html', form=form)
 
 
+@app.route('/comments/<int:post_id>', methods=['GET', 'POST'])
+def view_comments(post_id):
+    pass
+
 
 @app.route('/<action>/<username>', methods=['GET', 'POST'])
 @login_required
