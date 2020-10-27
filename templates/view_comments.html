@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=, initial-scale=1.0">
+	<link rel="stylesheet" href="../static/styles.css">
+	<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+	<title>Comments - {{ post.caption }}</title>
+</head>
+<body>
+	<div class="nav-bar">
+
+		<div class='header'>
+			<a href='/dashboard'><h3>PicShare</h3></a>
+
+		</div>
+
+		<div class='header-middle'>
+			<input type='text' placeholder='Search...'>
+		</div>
+
+		<div class='header-right'>
+			<a href='/dashboard'><i class="fas fa-home"></i></a>
+			<a href='/post'><i class="fas fa-plus-square"></i></a>
+			<a href='/account'><i class="fas fa-user-circle"></i></a>
+			<a href='/logout'><i class="fas fa-sign-out-alt"></i></a>
+		</div>
+
+	</div>
+	<hr>
+
+
+	<div class='comments-container'>
+		<div class='comments'>
+			{% for i in comments %}
+				<a href="{{ url_for('user', username=i.commenter.username)}}">{{ i.commenter.username}} commented {{ i.comment_body }}</a> <br><br>
+			{% endfor %}
+		</div>
+	</div>
+
+	
+	
+</body>
+</html>

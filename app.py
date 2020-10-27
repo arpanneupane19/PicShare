@@ -443,7 +443,9 @@ def comment(post_id):
 
 @app.route('/comments/<int:post_id>', methods=['GET', 'POST'])
 def view_comments(post_id):
-    pass
+    post = Post.query.get_or_404(post_id)
+    comments = Comment.query.filter_by(comment=post).all()
+    return render_template('view_comments.html', comments=comments, post=post)
 
 
 @app.route('/<action>/<username>', methods=['GET', 'POST'])
