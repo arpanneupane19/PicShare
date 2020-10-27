@@ -17,6 +17,7 @@ import secrets
 import datetime
 import flask_whooshalchemy as wa
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '4u9ajdslkf02kaldsjfj0'
 app.config['WHOOSH_BASE'] = 'whoosh'
