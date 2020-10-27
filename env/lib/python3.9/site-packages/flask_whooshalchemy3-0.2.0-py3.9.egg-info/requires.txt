@@ -1,0 +1,13 @@
+pbr==3.1.1
+blinker>=1.4
+Flask>=1.1
+Flask-SQLAlchemy<3.0,>=2.2
+SQLAlchemy<2.0,>=1.1
+Whoosh<3.0,>=2.7
+
+[test]
+werkzeug==0.16.1
+flask_testing
+testrepository
+testtools
+tox

@@ -14,11 +14,12 @@ from datetime import datetime
 from flask_bcrypt import Bcrypt
 from PIL import Image
 import secrets
-import time
 import datetime
+import flask_whooshalchemy as wa
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '4u9ajdslkf02kaldsjfj0'
+app.config['WHOOSH_BASE'] = 'whoosh'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 app.config['MAIL_SERVER']='smtp.gmail.com'
@@ -46,13 +47,15 @@ def make_session_permanent():
 
 # Database Tables
 class User(db.Model, UserMixin):
+    __searchable__ = ['username']
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(40), unique=True)
     password = db.Column(db.String(80))
     profile_pic = db.Column(db.String(20), nullable=False, default='default.jpg')
 
-    posts = db.relationship('Post', backref='owner', lazy='dynamic')
+    posts = db.relationship('Post', backref='owner', foreign_keys='Post.user_id', lazy='dynamic')
 
     sender = db.relationship('Message',
                                     foreign_keys='Message.sender_id',
@@ -98,6 +101,7 @@ class User(db.Model, UserMixin):
         except:
             return None
         return User.query.get(user_id)
+
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -203,16 +207,24 @@ class UpdatePost(FlaskForm):
 
 class CommentForm(FlaskForm):
     comment = TextAreaField(validators=[InputRequired(), Length(min=0, max=100)], render_kw={"placeholder": "Add a comment..."})
-    submit = SubmitField('Add')
+    submit = SubmitField('Comment')
 
+
+class SearchForm(FlaskForm):
+    search_str = StringField(validators=[InputRequired(), Length(min=0, max=15)], render_kw={"placeholder": "Search"})
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    search_form = SearchForm()
     posts = Post.query.all()
 
-    return render_template('dashboard.html', posts=posts, title='Dashboard')
+    if search_form.validate_on_submit():
+        pass
+
+
+    return render_template('dashboard.html', search_form=search_form, posts=posts, title='Dashboard')
 
 
 

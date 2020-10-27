@@ -15,9 +15,13 @@
 
 		</div>
 
-		<div class='header-middle'>
-			<input type='text' placeholder='Search...'>
-		</div>
+		<form method='POST'>
+			<div class='header-middle'>
+
+				{{search_form.hidden_tag()}}
+				{{search_form.search_str}}
+			</div>
+		</form>
 
 		<div class='header-right'>
 			<a href='/dashboard'><i class="fas fa-home"></i></a>
@@ -41,7 +45,7 @@
 		{% endwith %}
 	</div>
 
-	{% for post in posts %}
+	<!-- {% for post in posts %} -->
 	<div class='dashboard-post'>
 		<div class='dashboard-post-content'>
 
@@ -94,7 +98,7 @@
 		</div>
 	
 	</div>
-	{% endfor %}
+	<!-- {% endfor %} -->
 
 
 
