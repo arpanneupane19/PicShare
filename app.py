@@ -16,9 +16,11 @@ from PIL import Image
 import secrets
 import datetime
 import flask_whooshalchemy as wa
+from flask_socketio import SocketIO
 
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 app.config['SECRET_KEY'] = '4u9ajdslkf02kaldsjfj0'
 app.config['WHOOSH_BASE'] = 'whoosh'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -452,7 +454,7 @@ def comment(post_id):
         new_comment = Comment(comment=post, commenter=current_user, comment_body=form.comment.data)
         db.session.add(new_comment)
         db.session.commit()
-        return redirect(url_for('dashboard'))
+        # return redirect(url_for('dashboard'))
     return render_template('comment.html', form=form)
 
 
@@ -515,8 +517,6 @@ def message(receiver):
         db.session.add(message)
         db.session.commit()
 
-        if db.session.commit():
-            return redirect(request.url)
 
     messages_received = Message.query.filter_by(sender=user, receiver=current_user).all()
     messages_sent = Message.query.filter_by(sender=current_user, receiver=user).all()
@@ -529,4 +529,4 @@ def message(receiver):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)

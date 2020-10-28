@@ -16,6 +16,7 @@ hr {
 	height: 1px;
 	border: 0;
 	background-color: lightgray;
+	width: 100%;
 
 }
 
@@ -111,9 +112,6 @@ hr {
 	}
 
 
-	
-
-
 }
 
 
@@ -167,16 +165,38 @@ hr {
 		margin-left: 0px;
 	}
 
-	.dashboard-post {
-		display: flex;
-		flex-direction: column;
-		margin-top: 40px;
-		justify-content: center;
-		align-items: center;
-		margin-bottom: 40px;
-		width: 300px;
+	.dashboard-post-image > img{
+		width: 400px;
+		height: 400px;
+		object-fit: cover;
+		margin-bottom: 20px;
 	}
 	
+	.modify {
+		font-size: smaller;
+		margin-top: 3px;
+		margin-left: 0px;
+		display: flex;
+	}
+
+	.caption {
+		margin-top: 20px;
+		/* margin-left: 70px; */
+	}
+	
+	.profile-pic-username {
+		border-radius: 50%;
+		display: flex;
+		margin-bottom: 10px;
+		/* margin-left: 70px; */
+	}
+
+	.icons {
+		display: flex;
+		/* margin-left: 100px; */
+	}
+	
+
 
 }
 
@@ -410,8 +430,6 @@ hr {
 	justify-content: center;
 	align-items: center;
 	margin-bottom: 40px;
-	width: 500px;
-	margin-left: 30%;
 }
 
 
@@ -424,6 +442,7 @@ hr {
 
 .icons {
 	display: flex;
+
 }
 
 .icons > a{
@@ -434,7 +453,7 @@ hr {
 .modify {
 	font-size: smaller;
 	margin-top: 3px;
-	margin-left: 360px;
+	margin-left: 350px;
 	display: flex;
 }
 
@@ -480,3 +499,4 @@ hr {
 .comments-container {
 	text-align: center;
 }
+
