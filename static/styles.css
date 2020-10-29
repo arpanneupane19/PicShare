@@ -498,5 +498,18 @@ hr {
 
 .comments-container {
 	text-align: center;
+	margin-top: 80px;
 }
 
+
+.comment-box {
+	border: 1px solid lightgray;
+	border-radius: 10px;
+	padding: 10px;
+}
+
+.comment-delete{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

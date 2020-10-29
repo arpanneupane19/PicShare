@@ -32,18 +32,10 @@
 
 	<div class='comments-container'>
 		<div class='comments'>
-			{% for i in comments %}
-				<div>
-					{% if i.commenter == current_user %}
-					<div class='comment-delete'>
-						<a class='comment-box' href="{{ url_for('user', username=i.commenter.username)}}">{{ i.commenter.username}} commented {{ i.comment_body }}</a><br><br><br>
-						<a class='' href="{{ url_for('delete_comment', comment_id=comment.id)}}">Delete</a>
-					</div>
-					{% else %}
-					<a class="comment-box" href="{{ url_for('user', username=i.commenter.username)}}">{{ i.commenter.username}} commented {{ i.comment_body }}</a> <br><br>
-					{% endif %}
-				</div>
-			{% endfor %}
+			<div class='comment-box'>
+				<h1>There are currently no comments for this post.</h1>
+				<a href="{{ url_for('comment', post_id=post.id)}}">Be the first to comment!</a>	
+			</div>
 		</div>
 	</div>
 

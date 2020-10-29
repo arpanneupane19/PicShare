@@ -15,12 +15,8 @@ from flask_bcrypt import Bcrypt
 from PIL import Image
 import secrets
 import datetime
-import flask_whooshalchemy as wa
-from flask_socketio import SocketIO
-
 
 app = Flask(__name__)
-socketio = SocketIO(app)
 app.config['SECRET_KEY'] = '4u9ajdslkf02kaldsjfj0'
 app.config['WHOOSH_BASE'] = 'whoosh'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -454,21 +450,38 @@ def comment(post_id):
         new_comment = Comment(comment=post, commenter=current_user, comment_body=form.comment.data)
         db.session.add(new_comment)
         db.session.commit()
-        # return redirect(url_for('dashboard'))
+        return redirect(url_for('view_comments', post_id=post.id))
+
+
     return render_template('comment.html', form=form)
 
 
-@app.route('/delete-comment/<int:comment_id>/<int:post_id>', methods=['GET', 'POST'])
+@app.route('/delete-comment/<int:comment_id>', methods=['GET', 'POST'])
 @login_required
-def delete_comment(comment_id, post_id):
-    pass
+def delete_comment(comment_id):
+    comment_id = Comment.query.get_or_404(comment_id)
+
+    if comment_id.commenter != current_user:
+        abort(403)
+
+    db.session.delete(comment_id)
+    db.session.commit()
+    return redirect(request.referrer)
 
 
 @app.route('/comments/<int:post_id>', methods=['GET', 'POST'])
 def view_comments(post_id):
     post = Post.query.get_or_404(post_id)
     comments = Comment.query.filter_by(comment=post).all()
-    return render_template('view_comments.html', comments=comments, post=post)
+
+    comment = Comment()
+
+    total = 0
+    for comment in comments:
+        total += 1
+    if total == 0:
+        return render_template('no_comments.html', post=post)
+    return render_template('view_comments.html', comments=comments, comment=comment, post=post)
 
 
 @app.route('/<action>/<username>', methods=['GET', 'POST'])
@@ -535,4 +548,4 @@ def message(receiver):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    app.run(debug=True)
