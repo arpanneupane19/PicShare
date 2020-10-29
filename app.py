@@ -458,6 +458,12 @@ def comment(post_id):
     return render_template('comment.html', form=form)
 
 
+@app.route('/delete-comment/<int:comment_id>/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def delete_comment(comment_id, post_id):
+    pass
+
+
 @app.route('/comments/<int:post_id>', methods=['GET', 'POST'])
 def view_comments(post_id):
     post = Post.query.get_or_404(post_id)
