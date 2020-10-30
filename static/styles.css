@@ -20,6 +20,8 @@ hr {
 
 }
 
+/* Navigation bar */
+
 .nav-bar {
 	display: flex;
 	justify-content: space-between;
@@ -274,8 +276,7 @@ hr {
 	text-align: center;
 	margin-bottom: 10px;
 	margin-top: 10px;
-	/* margin-left: 30%; */
-	/* margin-right: 30%; */
+
 }
 
 .username-photo {
@@ -512,4 +513,31 @@ hr {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+/* When visiting a different user's profile */
+.user {
+	margin-top: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.user-info {
+	display: flex;
+	justify-content: center;
+	align-items: center;	
+	border: 1px solid lightgray;
+	border-radius: 3px;
+	padding: 30px;
+}
+
+.user-profile-pic-image > img{
+	border-radius: 50%;
+	height: 80px;
+	width: 80px;
+}
+
+.user-profile-info {
+	margin-left: 60px;
 }

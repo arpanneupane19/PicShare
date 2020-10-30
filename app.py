@@ -544,8 +544,5 @@ def message(receiver):
     return render_template('message.html', form=form, user=user, messages_received=messages_received, messages_sent=messages_sent)
 
 
-
-
-
 if __name__ == '__main__':
     app.run(debug=True)

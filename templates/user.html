@@ -33,7 +33,7 @@
 		<div class='user-info'>
 
 
-			<div class='profile-pic'>
+			<div class='user-profile-pic-image'>
 				<img src='../static/profile_pics/{{ user.profile_pic }}'>
 			</div>
 
@@ -68,57 +68,5 @@
 		</div>
 	</div>
 
-
-
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
-
-		* {
-			margin: 0;
-			font-family: 'Roboto', sans-serif;
-		}
-
-		a {
-			text-decoration: none;
-			color: black;
-
-		}
-
-		hr {
-			height: 1px;
-			border: 0;
-			background-color: lightgray;
-
-		}
-
-		.user {
-			display: flex;
-		}
-
-		.user-info {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			margin-left: 30%;
-			margin-right: 30%;
-			margin-top: 40px;
-		}
-
-		.user-profile-info {
-			display: flex;
-			flex-direction: column;
-			margin-left: 100px;
-			margin-bottom: 40px;
-		}
-
-		.profile-pic > img {
-			height: 110px;
-			width: 110px;
-			border-radius: 50%;
-			object-fit: cover;
-		}
-
-
-	</style>
 
 {% endblock %}
